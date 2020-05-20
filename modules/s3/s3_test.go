@@ -32,16 +32,14 @@ func TestS3ObjectHasTag(t *testing.T) {
 		return mockS3Client{}
 	}
 
-	a := AWSSpec{
-		Session: sess,
-	}
+	s := New(sess)
 
 	tag := Tag{
 		Key:   "TestKey",
 		Value: "Nope",
 	}
 
-	res, err := a.S3ObjectHasTag("bucket", "key", tag)
+	res, err := s.S3ObjectHasTag("bucket", "key", tag)
 	assert.Nil(t, err)
 	assert.False(t, res)
 
@@ -50,7 +48,7 @@ func TestS3ObjectHasTag(t *testing.T) {
 		Value: "TestValue",
 	}
 
-	res, err = a.S3ObjectHasTag("bucket", "key", tag)
+	res, err = s.S3ObjectHasTag("bucket", "key", tag)
 	assert.Nil(t, err)
 	assert.True(t, res)
 }
