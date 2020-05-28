@@ -17,7 +17,7 @@ type mockS3Client struct {
 func (m mockS3Client) GetObjectTagging(*s3.GetObjectTaggingInput) (o *s3.GetObjectTaggingOutput, err error) {
 	o = &s3.GetObjectTaggingOutput{
 		TagSet: []*s3.Tag{
-			&s3.Tag{
+			{
 				Key:   aws.String("TestKey"),
 				Value: aws.String("TestValue"),
 			},
