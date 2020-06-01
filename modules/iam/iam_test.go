@@ -2,20 +2,20 @@ package awsspec
 
 import (
 	"net/url"
-	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/stretchr/testify/assert"
 )
-
-var policyVer = "v1"
 
 type mockIAMAPI struct {
 	iamiface.IAMAPI
 }
+
+var (
+	policyPrefix = "arn:aws:iam::aws:policy/"
+	userPolicies = []string{"Test", "AnotherTest"}
+)
 
 func (m mockIAMAPI) GetPolicyVersion(*iam.GetPolicyVersionInput) (o *iam.GetPolicyVersionOutput, err error) {
 	policy := `{
@@ -80,42 +80,18 @@ func (m mockIAMAPI) ListPolicyVersions(i *iam.ListPolicyVersionsInput) (o *iam.L
 	return
 }
 
-func TestFindDefaultPolicyVersion(t *testing.T) {
-	sess, _ := session.NewSession()
-	getIAMAPI = func(s *session.Session) iamiface.IAMAPI {
-		return mockIAMAPI{}
+func (m mockIAMAPI) ListAttachedUserPolicies(input *iam.ListAttachedUserPoliciesInput) (o *iam.ListAttachedUserPoliciesOutput, err error) {
+	policies := []*iam.AttachedPolicy{}
+	for _, v := range userPolicies {
+		p := &iam.AttachedPolicy{
+			PolicyArn:  aws.String(policyPrefix + v),
+			PolicyName: aws.String(v),
+		}
+		policies = append(policies, p)
 	}
 
-	i := New(sess)
-
-	ver, err := i.findDefaultPolicyVersion("arn")
-	assert.Nil(t, err)
-	assert.Equal(t, policyVer, ver)
-
-	ver, err = i.findDefaultPolicyVersion("arnFalse")
-	assert.Nil(t, err)
-	assert.NotEqual(t, policyVer, ver)
-
-	ver, err = i.findDefaultPolicyVersion("err")
-	assert.NotNil(t, err)
-}
-
-func TestPolicyAllows(t *testing.T) {
-	sess, _ := session.NewSession()
-	getIAMAPI = func(s *session.Session) iamiface.IAMAPI {
-		return mockIAMAPI{}
+	o = &iam.ListAttachedUserPoliciesOutput{
+		AttachedPolicies: policies,
 	}
-
-	i := New(sess)
-	res, err := i.PolicyAllows("arn", []string{"action1", "action2"}, []string{"resource1"})
-	assert.Nil(t, err)
-	assert.True(t, res)
-
-	res, err = i.PolicyAllows("arn", []string{"action3"}, []string{"resource2"})
-	assert.Nil(t, err)
-	assert.True(t, res)
-
-	res, err = i.PolicyAllows("arn", []string{"action1"}, []string{"resource2"})
-	assert.Nil(t, err)
-	assert.False(t, res)
+	return
 }
