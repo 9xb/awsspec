@@ -3,7 +3,6 @@ package awsspec
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/davecgh/go-spew/spew"
 )
 
 type (
@@ -44,7 +43,6 @@ func (c CWSpec) AlarmBelongsToMetric(alarmName string, metric Metric) (res bool,
 	if err != nil {
 		return
 	}
-	spew.Dump(out)
 
 	for _, v := range out.MetricAlarms {
 		if aws.StringValue(v.MetricName) == metric.Name {
