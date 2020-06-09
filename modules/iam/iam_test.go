@@ -95,3 +95,21 @@ func (m mockIAMAPI) ListAttachedUserPolicies(input *iam.ListAttachedUserPolicies
 	}
 	return
 }
+
+func (m mockIAMAPI) ListAttachedRolePolicies(input *iam.ListAttachedRolePoliciesInput) (o *iam.ListAttachedRolePoliciesOutput, err error) {
+	policies := []*iam.AttachedPolicy{}
+
+	for _, v := range userPolicies {
+		p := &iam.AttachedPolicy{
+			PolicyArn:  aws.String(policyPrefix + v),
+			PolicyName: aws.String(v),
+		}
+		policies = append(policies, p)
+	}
+
+	o = &iam.ListAttachedRolePoliciesOutput{
+		AttachedPolicies: policies,
+	}
+
+	return
+}
