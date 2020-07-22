@@ -8,18 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeploymentConfigHasComputePlatformExists(t *testing.T) {
+func TestDeploymentConfigExists(t *testing.T) {
 	sess, _ := session.NewSession()
 	getCodeDeployAPI = func(s *session.Session) codedeployiface.CodeDeployAPI {
 		return mockCodeDeployAPI{}
 	}
 
 	c := New(sess)
-	res, err := c.DeploymentConfigHasComputePlatformExists("test")
+	res, err := c.DeploymentConfigExists("test")
 	assert.Nil(t, err)
 	assert.True(t, res)
 
-	res, err = c.DeploymentConfigHasComputePlatformExists("noexist")
+	res, err = c.DeploymentConfigExists("noexist")
 	assert.Nil(t, err)
 	assert.False(t, res)
 }

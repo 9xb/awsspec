@@ -7,8 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/codedeploy"
 )
 
-// DeploymentConfigHasComputePlatformExists returns true if the specified Deployment Config exist
-func (c CodeDeploySpec) DeploymentConfigHasComputePlatformExists(name string) (res bool, err error) {
+// DeploymentConfigExists returns true if the specified Deployment Config exist
+func (c CodeDeploySpec) DeploymentConfigExists(name string) (res bool, err error) {
 	_, err = getDeploymentConfig(c.Session, name)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
