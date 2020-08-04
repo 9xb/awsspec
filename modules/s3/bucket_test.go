@@ -93,19 +93,19 @@ func TestBucketHasWebsiteEnabled(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestBucketHasLifcecycleRule(t *testing.T) {
+func TestBucketHasLifecycleRule(t *testing.T) {
 	s := setupTestEnv()
 	rule := s3.Rule{
 		Status: aws.String("Enabled"),
 		Prefix: aws.String(lifecyclePrefix),
 	}
 
-	res, err := s.BucketHasLifcecycleRule(bucket, rule)
+	res, err := s.BucketHasLifecycleRule(bucket, rule)
 	assert.Nil(t, err)
 	assert.True(t, res)
 
 	rule.Status = aws.String("Disabled")
-	res, err = s.BucketHasLifcecycleRule(bucket, rule)
+	res, err = s.BucketHasLifecycleRule(bucket, rule)
 	assert.Nil(t, err)
 	assert.False(t, res)
 
@@ -113,7 +113,7 @@ func TestBucketHasLifcecycleRule(t *testing.T) {
 		Status: aws.String("Enabled"),
 		Prefix: aws.String(lifecyclePrefix + "s"),
 	}
-	res, err = s.BucketHasLifcecycleRule(bucket, rule)
+	res, err = s.BucketHasLifecycleRule(bucket, rule)
 	assert.Nil(t, err)
 	assert.False(t, res)
 
@@ -121,10 +121,10 @@ func TestBucketHasLifcecycleRule(t *testing.T) {
 		Status: aws.String("Enabled"),
 		Prefix: aws.String(lifecyclePrefix),
 	}
-	res, err = s.BucketHasLifcecycleRule("nope", rule)
+	res, err = s.BucketHasLifecycleRule("nope", rule)
 	assert.Nil(t, err)
 	assert.False(t, res)
 
-	_, err = s.BucketHasLifcecycleRule(bucket+"s", rule)
+	_, err = s.BucketHasLifecycleRule(bucket+"s", rule)
 	assert.NotNil(t, err)
 }

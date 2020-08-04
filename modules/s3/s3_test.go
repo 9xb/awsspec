@@ -92,7 +92,9 @@ func (m mockS3Client) GetBucketEncryption(input *s3.GetBucketEncryptionInput) (o
 	}
 
 	if aws.StringValue(input.Bucket) == "nope" {
-		return &s3.GetBucketEncryptionOutput{}, nil
+		err = awserr.NewRequestFailure(
+			awserr.New("ServerSideEncryptionConfigurationNotFoundError", "The specified bucket does not have a website configuration", nil), 1, "test")
+		return
 	}
 
 	return o, errors.New("nope")
@@ -108,7 +110,9 @@ func (m mockS3Client) GetBucketWebsite(input *s3.GetBucketWebsiteInput) (o *s3.G
 	}
 
 	if aws.StringValue(input.Bucket) == "nope" {
-		return &s3.GetBucketWebsiteOutput{}, nil
+		err = awserr.NewRequestFailure(
+			awserr.New("NoSuchWebsiteConfiguration", "The specified bucket does not have a website configuration", nil), 1, "test")
+		return
 	}
 
 	return o, errors.New("nope")

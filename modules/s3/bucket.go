@@ -1,7 +1,6 @@
 package awsspec
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -19,7 +18,6 @@ func (s S3Spec) BucketExists(bucket string) (res bool, err error) {
 	_, err = svc.HeadBucket(in)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
-			fmt.Println(aerr.Code())
 			if aerr.Code() == s3.ErrCodeNoSuchBucket {
 				return false, nil
 			}
@@ -76,6 +74,12 @@ func (s S3Spec) BucketHasServerSideEncryption(bucket, algorithm string) (res boo
 	}
 	out, err := svc.GetBucketEncryption(in)
 	if err != nil {
+		if reqerr, ok := err.(awserr.RequestFailure); ok {
+			if reqerr.Code() == "ServerSideEncryptionConfigurationNotFoundError" {
+				return false, nil
+			}
+			return
+		}
 		return
 	}
 
@@ -105,6 +109,12 @@ func (s S3Spec) BucketHasWebsiteEnabled(bucket string) (res bool, err error) {
 	}
 	out, err := svc.GetBucketWebsite(in)
 	if err != nil {
+		if reqerr, ok := err.(awserr.RequestFailure); ok {
+			if reqerr.Code() == "NoSuchWebsiteConfiguration" {
+				return false, nil
+			}
+			return
+		}
 		return
 	}
 
@@ -115,8 +125,8 @@ func (s S3Spec) BucketHasWebsiteEnabled(bucket string) (res bool, err error) {
 	return true, nil
 }
 
-// BucketHasLifcecycleRule returns true if the specified S3 bucket has the provided lifecycle rule. Throws an error if the bucket does not exist.
-func (s S3Spec) BucketHasLifcecycleRule(bucket string, rule s3.Rule) (res bool, err error) {
+// BucketHasLifecycleRule returns true if the specified S3 bucket has the provided lifecycle rule. Throws an error if the bucket does not exist.
+func (s S3Spec) BucketHasLifecycleRule(bucket string, rule s3.Rule) (res bool, err error) {
 	svc := getS3API(s.Session)
 	in := &s3.GetBucketLifecycleInput{
 		Bucket: aws.String(bucket),
