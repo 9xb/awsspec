@@ -11,12 +11,32 @@ import (
 
 var (
 	bucket          = "testBucket"
+	key             = "testObject"
 	algorithm       = "testAlgorithm"
 	lifecyclePrefix = "testPrefix"
 )
 
 type mockS3Client struct {
 	s3iface.S3API
+}
+
+func (m mockS3Client) HeadObject(input *s3.HeadObjectInput) (o *s3.HeadObjectOutput, err error) {
+	if aws.StringValue(input.Bucket) != bucket {
+		err = awserr.New(s3.ErrCodeNoSuchBucket, "", err)
+		return
+	}
+
+	if aws.StringValue(input.Key) == "nope" {
+		err = errors.New("nope")
+		return
+	}
+
+	if aws.StringValue(input.Key) != key {
+		err = awserr.New(s3.ErrCodeNoSuchKey, "", err)
+		return
+	}
+
+	return &s3.HeadObjectOutput{ETag: aws.String("test")}, nil
 }
 
 func (m mockS3Client) GetObjectTagging(*s3.GetObjectTaggingInput) (o *s3.GetObjectTaggingOutput, err error) {
