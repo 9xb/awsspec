@@ -95,7 +95,7 @@ func TestBucketHasWebsiteEnabled(t *testing.T) {
 
 func TestBucketHasLifecycleRule(t *testing.T) {
 	s := setupTestEnv()
-	rule := s3.Rule{
+	rule := s3.LifecycleRule{
 		Status: aws.String("Enabled"),
 		Prefix: aws.String(lifecyclePrefix),
 	}
@@ -109,7 +109,7 @@ func TestBucketHasLifecycleRule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.False(t, res)
 
-	rule = s3.Rule{
+	rule = s3.LifecycleRule{
 		Status: aws.String("Enabled"),
 		Prefix: aws.String(lifecyclePrefix + "s"),
 	}
@@ -117,7 +117,7 @@ func TestBucketHasLifecycleRule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.False(t, res)
 
-	rule = s3.Rule{
+	rule = s3.LifecycleRule{
 		Status: aws.String("Enabled"),
 		Prefix: aws.String(lifecyclePrefix),
 	}

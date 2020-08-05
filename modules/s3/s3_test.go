@@ -138,10 +138,10 @@ func (m mockS3Client) GetBucketWebsite(input *s3.GetBucketWebsiteInput) (o *s3.G
 	return o, errors.New("nope")
 }
 
-func (m mockS3Client) GetBucketLifecycle(input *s3.GetBucketLifecycleInput) (o *s3.GetBucketLifecycleOutput, err error) {
+func (m mockS3Client) GetBucketLifecycleConfiguration(input *s3.GetBucketLifecycleConfigurationInput) (o *s3.GetBucketLifecycleConfigurationOutput, err error) {
 	if aws.StringValue(input.Bucket) == bucket {
-		o = &s3.GetBucketLifecycleOutput{
-			Rules: []*s3.Rule{
+		o = &s3.GetBucketLifecycleConfigurationOutput{
+			Rules: []*s3.LifecycleRule{
 				{
 					Status: aws.String("Enabled"),
 					Prefix: aws.String(lifecyclePrefix),
@@ -152,7 +152,7 @@ func (m mockS3Client) GetBucketLifecycle(input *s3.GetBucketLifecycleInput) (o *
 	}
 
 	if aws.StringValue(input.Bucket) == "nope" {
-		return &s3.GetBucketLifecycleOutput{}, nil
+		return &s3.GetBucketLifecycleConfigurationOutput{}, nil
 	}
 
 	return o, errors.New("nope")

@@ -126,12 +126,12 @@ func (s S3Spec) BucketHasWebsiteEnabled(bucket string) (res bool, err error) {
 }
 
 // BucketHasLifecycleRule returns true if the specified S3 bucket has the provided lifecycle rule. Throws an error if the bucket does not exist.
-func (s S3Spec) BucketHasLifecycleRule(bucket string, rule s3.Rule) (res bool, err error) {
+func (s S3Spec) BucketHasLifecycleRule(bucket string, rule s3.LifecycleRule) (res bool, err error) {
 	svc := getS3API(s.Session)
-	in := &s3.GetBucketLifecycleInput{
+	in := &s3.GetBucketLifecycleConfigurationInput{
 		Bucket: aws.String(bucket),
 	}
-	out, err := svc.GetBucketLifecycle(in)
+	out, err := svc.GetBucketLifecycleConfiguration(in)
 	if err != nil {
 		return
 	}
