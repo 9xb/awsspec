@@ -1,8 +1,11 @@
 package awsspec
 
 import (
+	"encoding/json"
 	"errors"
+	"net/url"
 
+	iamSpec "github.com/9xb/awsspec/modules/iam"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -197,6 +200,39 @@ func (l LambdaSpec) FunctionHasVPCWithSecurityGroups(name, qualifier string, sgs
 	}
 
 	if sameStringSlice(ls, sgs) {
+		return true, nil
+	}
+
+	return
+}
+
+// FunctionHasPermissions returns true if the specified source ARN can execute the provided Lambda function. It throws an error if no function was found.
+func (l LambdaSpec) FunctionHasPermissions(name, qualifier, source string) (res bool, err error) {
+	svc := getLambdaAPI(l.Session)
+	in := &lambda.GetPolicyInput{
+		FunctionName: aws.String(name),
+	}
+
+	if qualifier != "" {
+		in.Qualifier = aws.String(qualifier)
+	}
+
+	out, err := svc.GetPolicy(in)
+	if err != nil {
+		return
+	}
+
+	doc := iamSpec.PolicyDocument{}
+	p, err := url.QueryUnescape(aws.StringValue(out.Policy))
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal([]byte(p), &doc)
+	if err != nil {
+		return
+	}
+
+	if doc.Statement[0].Condition[iamSpec.ConditionArnLike][iamSpec.VarSourceArn][0] == source {
 		return true, nil
 	}
 

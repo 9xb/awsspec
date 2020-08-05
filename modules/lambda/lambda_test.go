@@ -1,6 +1,8 @@
 package awsspec
 
 import (
+	"errors"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -36,7 +38,8 @@ var (
 		"test_one",
 		"test_two",
 	}
-	vpc = "test_vpc"
+	vpc       = "test_vpc"
+	sourceARN = "testARN"
 )
 
 func (m mockLambdaAPI) GetFunction(input *lambda.GetFunctionInput) (o *lambda.GetFunctionOutput, err error) {
@@ -126,4 +129,39 @@ func (m mockLambdaAPI) GetFunction(input *lambda.GetFunctionInput) (o *lambda.Ge
 	}
 
 	return o, awserr.New("ResourceNotFoundException", "", err)
+}
+
+func (m mockLambdaAPI) GetPolicy(input *lambda.GetPolicyInput) (o *lambda.GetPolicyOutput, err error) {
+	if aws.StringValue(input.FunctionName) != functionName {
+		sourceARN = sourceARN + "s"
+	}
+
+	policy := `{
+		"Version": "2012-10-17",
+		"Id": "default",
+		"Statement": [{
+			"Sid": "api-gw",
+			"Effect": "Allow",
+			"Principal": {
+				"Service": "apigateway.amazonaws.com"
+			},
+			"Action": "lambda:InvokeFunction",
+			"Resource": "arn:aws:lambda:eu-west-1:357027635596:function:peracto-api-qa-api:live",
+			"Condition": {
+				"ArnLike": {
+					"AWS:SourceArn": "` + sourceARN + `"
+				}
+			}
+		}]
+	}`
+
+	if aws.StringValue(input.FunctionName) == "nope" {
+		return o, errors.New("nope")
+	}
+
+	o = &lambda.GetPolicyOutput{
+		Policy: aws.String(policy),
+	}
+
+	return
 }

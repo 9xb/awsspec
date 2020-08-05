@@ -217,3 +217,22 @@ func TestFunctionHasVPCWithSecurityGroups(t *testing.T) {
 	res, err = l.FunctionHasVPCWithSecurityGroups("nope", "", testSlice)
 	assert.NotNil(t, err)
 }
+
+func TestFunctionHasPermissions(t *testing.T) {
+	sess, _ := session.NewSession()
+	getLambdaAPI = func(sess *session.Session) (client lambdaiface.LambdaAPI) {
+		return mockLambdaAPI{}
+	}
+
+	l := New(sess)
+	res, err := l.FunctionHasPermissions(functionName, "", sourceARN)
+	assert.Nil(t, err)
+	assert.True(t, res)
+
+	res, err = l.FunctionHasPermissions(functionName+"s", "", sourceARN)
+	assert.Nil(t, err)
+	assert.False(t, res)
+
+	_, err = l.FunctionHasPermissions("nope", "", sourceARN)
+	assert.NotNil(t, err)
+}

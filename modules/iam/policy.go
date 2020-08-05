@@ -10,6 +10,11 @@ import (
 )
 
 type (
+	ConditionOperator interface {
+		GetOperator() string
+		GetVariable() string
+		GetValue() interface{}
+	}
 	// PolicyDocument represents an IAM policy document
 	PolicyDocument struct {
 		Version   string
@@ -29,12 +34,63 @@ type (
 		NotAction    *OptSlice
 		Resource     *OptSlice
 		NotResource  *OptSlice
-		Condition    interface{}
+		Condition    map[ConditionType]map[ConditionVariable]OptSlice `json:",omitempty"`
 	}
 
 	// OptSlice is an entity that could be either a JSON string or a slice
 	// As per https://stackoverflow.com/a/38757780/543423
 	OptSlice []string
+
+	// ConditionType represents all the possible comparison types for the
+	// Condition of a Policy Statement
+	// Inspired by github.com/gwkunze/goiam/policy
+	ConditionType string
+
+	// ConditionVariable represent the available variables used in Conditions
+	// Inspired by github.com/gwkunze/goiam/policy
+	ConditionVariable string
+)
+
+const (
+	ConditionStringEquals              ConditionType = "StringEquals"
+	ConditionStringNotEquals           ConditionType = "StringNotEquals"
+	ConditionStringEqualsIgnoreCase    ConditionType = "StringEqualsIgnoreCase"
+	ConditionStringNotEqualsIgnoreCase ConditionType = "StringNotEqualsIgnoreCase"
+	ConditionStringLike                ConditionType = "StringLike"
+	ConditionStringNotLike             ConditionType = "StringNotLike"
+	ConditionNumericEquals             ConditionType = "NumericEquals"
+	ConditionNumericNotEquals          ConditionType = "NumericNotEquals"
+	ConditionNumericLessThan           ConditionType = "NumericLessThan"
+	ConditionNumericLessThanEquals     ConditionType = "NumericLessThanEquals"
+	ConditionNumericGreaterThan        ConditionType = "NumericGreaterThan"
+	ConditionNumericGreaterThanEquals  ConditionType = "NumericGreaterThanEquals"
+	ConditionDateEquals                ConditionType = "DateEquals"
+	ConditionDateNotEquals             ConditionType = "DateNotEquals"
+	ConditionDateLessThan              ConditionType = "DateLessThan"
+	ConditionDateLessThanEquals        ConditionType = "DateLessThanEquals"
+	ConditionDateGreaterThan           ConditionType = "DateGreaterThan"
+	ConditionDateGreaterThanEquals     ConditionType = "DateGreaterThanEquals"
+	ConditionBool                      ConditionType = "Bool"
+	ConditionIpAddress                 ConditionType = "IpAddress"
+	ConditionNotIpAddress              ConditionType = "NotIpAddress"
+	ConditionArnEquals                 ConditionType = "ArnEquals"
+	ConditionArnNotEquals              ConditionType = "ArnNotEquals"
+	ConditionArnLike                   ConditionType = "ArnLike"
+	ConditionArnNotLike                ConditionType = "ArnNotLike"
+	ConditionNull                      ConditionType = "Null"
+)
+
+const (
+	VarCurrentTime        ConditionVariable = "AWS:CurrentTime"
+	VarEpochTime          ConditionVariable = "AWS:EpochTime"
+	VarMultiFactorAuthAge ConditionVariable = "AWS:MultiFactorAuthAge"
+	VarPrincipalType      ConditionVariable = "AWS:principaltype"
+	VarSecureTransport    ConditionVariable = "AWS:SecureTransport"
+	VarSourceArn          ConditionVariable = "AWS:SourceArn"
+	VarSourceIp           ConditionVariable = "AWS:SourceIp"
+	VarUserAgent          ConditionVariable = "AWS:UserAgent"
+	VarUsedId             ConditionVariable = "AWS:userid"
+	VarUsername           ConditionVariable = "AWS:username"
 )
 
 // MarshalJSON returns o as the JSON encoding of o
