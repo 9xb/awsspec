@@ -239,6 +239,20 @@ func (l LambdaSpec) FunctionHasPermissions(name, qualifier, source string) (res 
 	return
 }
 
+// FunctionAliasHasVersion returns true if the provided Lambda function alias is associated to the specified version
+func (l LambdaSpec) FunctionAliasHasVersion(name, qualifier, version string) (res bool, err error) {
+	r, err := getFunctionConfig(name, qualifier, "version", l.Session)
+	if err != nil {
+		return
+	}
+
+	if aws.StringValue(r.(*string)) == version {
+		return true, nil
+	}
+
+	return
+}
+
 func getFunctionConfig(name, qualifier, cfgName string, s *session.Session) (cfg interface{}, err error) {
 	svc := getLambdaAPI(s)
 	in := &lambda.GetFunctionInput{
@@ -271,6 +285,8 @@ func getFunctionConfig(name, qualifier, cfgName string, s *session.Session) (cfg
 		cfg = out.Configuration.Layers
 	case "vpc":
 		cfg = out.Configuration.VpcConfig
+	case "version":
+		cfg = out.Configuration.Version
 	}
 
 	if cfg == nil {

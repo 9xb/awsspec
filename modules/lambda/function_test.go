@@ -236,3 +236,22 @@ func TestFunctionHasPermissions(t *testing.T) {
 	_, err = l.FunctionHasPermissions("nope", "", sourceARN)
 	assert.NotNil(t, err)
 }
+
+func TestFunctionAliasHasVersion(t *testing.T) {
+	sess, _ := session.NewSession()
+	getLambdaAPI = func(sess *session.Session) (client lambdaiface.LambdaAPI) {
+		return mockLambdaAPI{}
+	}
+
+	l := New(sess)
+	res, err := l.FunctionAliasHasVersion(fnWithVersion, "", version)
+	assert.Nil(t, err)
+	assert.True(t, res)
+
+	res, err = l.FunctionAliasHasVersion(functionName, "", version)
+	assert.Nil(t, err)
+	assert.False(t, res)
+
+	res, err = l.FunctionAliasHasVersion("nope", "", version)
+	assert.NotNil(t, err)
+}

@@ -25,6 +25,7 @@ var (
 	fnWithSubnets = "testSubnets"
 	fnWithSGs     = "testSGs"
 	fnWithVPC     = "testVPC"
+	fnWithVersion = "testVersion"
 
 	qualifier   = "alias"
 	envVarName  = "VAR_NAME"
@@ -40,6 +41,7 @@ var (
 	}
 	vpc       = "test_vpc"
 	sourceARN = "testARN"
+	version   = "15"
 )
 
 func (m mockLambdaAPI) GetFunction(input *lambda.GetFunctionInput) (o *lambda.GetFunctionOutput, err error) {
@@ -125,6 +127,10 @@ func (m mockLambdaAPI) GetFunction(input *lambda.GetFunctionInput) (o *lambda.Ge
 			s = append(s, aws.String(v))
 		}
 		out.Configuration.VpcConfig.SecurityGroupIds = s
+		return out, nil
+
+	case fnWithVersion:
+		out.Configuration.Version = aws.String(version)
 		return out, nil
 	}
 
