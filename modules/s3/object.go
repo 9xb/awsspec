@@ -21,7 +21,7 @@ type (
 		Session *session.Session
 	}
 
-	// Tag represents an S3 object tag
+	// Tag represents an AWS tag
 	Tag struct {
 		Key   string
 		Value string
