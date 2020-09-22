@@ -1,6 +1,7 @@
 package awsspec
 
 import (
+	s3Spec "github.com/9xb/awsspec/modules/s3"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
 )
@@ -97,4 +98,28 @@ func (c CWSpec) AlarmActionsEnabled(alarmName string) (res bool, err error) {
 	}
 
 	return
+}
+
+// AlarmHasTag checks whether the indicated alarm has the indicated tags
+func (c CWSpec) AlarmHasTag(alarmARN string, tag s3Spec.TagGetter) (res bool, err error) {
+	svc := getCWAPI(c.Session)
+	in := &cloudwatch.ListTagsForResourceInput{
+		ResourceARN: aws.String(alarmARN),
+	}
+
+	out, err := svc.ListTagsForResource(in)
+	if err != nil {
+		return
+	}
+
+	for _, t := range out.Tags {
+		if aws.StringValue(t.Key) == tag.GetKey() {
+			if aws.StringValue(t.Value) == tag.GetValue() {
+				return true, nil
+			}
+		}
+	}
+
+	return
+
 }

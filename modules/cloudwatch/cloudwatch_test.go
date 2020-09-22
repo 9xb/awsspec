@@ -11,6 +11,17 @@ var (
 	namespace      = "TestNamespace"
 	actionsEnabled = true
 	alarmAction    = "action1"
+	resourceARN    = "testARN"
+	tags           = []*cloudwatch.Tag{
+		{
+			Key:   aws.String("testKey"),
+			Value: aws.String("testValue"),
+		},
+		{
+			Key:   aws.String("nope"),
+			Value: aws.String("nope"),
+		},
+	}
 )
 
 type mockCloudWatchAPI struct {
@@ -41,4 +52,21 @@ func (m mockCloudWatchAPI) DescribeAlarms(in *cloudwatch.DescribeAlarmsInput) (o
 	}
 
 	return
+}
+
+func (m mockCloudWatchAPI) ListTagsForResource(input *cloudwatch.ListTagsForResourceInput) (o *cloudwatch.ListTagsForResourceOutput, err error) {
+	if aws.StringValue(input.ResourceARN) == resourceARN {
+		t := &cloudwatch.ListTagsForResourceOutput{
+			Tags: tags[0:1],
+		}
+
+		return t, nil
+	}
+
+	t := &cloudwatch.ListTagsForResourceOutput{
+		Tags: tags[1:1],
+	}
+
+	return t, nil
+
 }

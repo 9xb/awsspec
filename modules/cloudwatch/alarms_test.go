@@ -3,6 +3,9 @@ package awsspec
 import (
 	"testing"
 
+	s3Spec "github.com/9xb/awsspec/modules/s3"
+	"github.com/aws/aws-sdk-go/aws"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
 	"github.com/stretchr/testify/assert"
@@ -72,6 +75,27 @@ func TestAlarmActionsEnabled(t *testing.T) {
 
 	actionsEnabled = false
 	res, err = c.AlarmActionsEnabled("test")
+	assert.Nil(t, err)
+	assert.False(t, res)
+}
+
+func TestAlarmHasTag(t *testing.T) {
+	sess, _ := session.NewSession()
+	getCWAPI = func(sess *session.Session) (client cloudwatchiface.CloudWatchAPI) {
+		return mockCloudWatchAPI{}
+	}
+
+	c := New(sess)
+
+	tag := s3Spec.Tag{
+		Key:   aws.StringValue(tags[0].Key),
+		Value: aws.StringValue(tags[0].Value),
+	}
+	res, err := c.AlarmHasTag(resourceARN, tag)
+	assert.Nil(t, err)
+	assert.True(t, res)
+
+	res, err = c.AlarmHasTag("nope", tag)
 	assert.Nil(t, err)
 	assert.False(t, res)
 }
