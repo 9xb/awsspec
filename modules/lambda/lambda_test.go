@@ -39,9 +39,10 @@ var (
 		"test_one",
 		"test_two",
 	}
-	vpc       = "test_vpc"
-	sourceARN = "testARN"
-	version   = "15"
+	vpc           = "test_vpc"
+	sourceARN     = "testARN"
+	version       = "15"
+	reservedExecs = 50
 )
 
 func (m mockLambdaAPI) GetFunction(input *lambda.GetFunctionInput) (o *lambda.GetFunctionOutput, err error) {
@@ -170,4 +171,16 @@ func (m mockLambdaAPI) GetPolicy(input *lambda.GetPolicyInput) (o *lambda.GetPol
 	}
 
 	return
+}
+
+func (m mockLambdaAPI) GetFunctionConcurrency(input *lambda.GetFunctionConcurrencyInput) (o *lambda.GetFunctionConcurrencyOutput, err error) {
+	if aws.StringValue(input.FunctionName) == functionName {
+		return &lambda.GetFunctionConcurrencyOutput{
+			ReservedConcurrentExecutions: aws.Int64(int64(reservedExecs)),
+		}, nil
+	}
+
+	return &lambda.GetFunctionConcurrencyOutput{
+		ReservedConcurrentExecutions: aws.Int64(5),
+	}, nil
 }

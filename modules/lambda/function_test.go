@@ -255,3 +255,19 @@ func TestFunctionAliasHasVersion(t *testing.T) {
 	res, err = l.FunctionAliasHasVersion("nope", "", version)
 	assert.NotNil(t, err)
 }
+
+func TestFunctionHasReservedConcurrency(t *testing.T) {
+	sess, _ := session.NewSession()
+	getLambdaAPI = func(sess *session.Session) (client lambdaiface.LambdaAPI) {
+		return mockLambdaAPI{}
+	}
+
+	l := New(sess)
+	res, err := l.FunctionHasReservedConcurrency(functionName, reservedExecs)
+	assert.Nil(t, err)
+	assert.True(t, res)
+
+	res, err = l.FunctionHasReservedConcurrency("nope", reservedExecs)
+	assert.Nil(t, err)
+	assert.False(t, res)
+}
