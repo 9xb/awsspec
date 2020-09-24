@@ -255,6 +255,7 @@ func (l LambdaSpec) FunctionAliasHasVersion(name, qualifier, version string) (re
 
 // FunctionHasReservedConcurrency returns true if the provided Lambda function has the provided reserved concurrency. It throws an error if no function was found.
 func (l LambdaSpec) FunctionHasReservedConcurrency(name string, concurrency int) (res bool, err error) {
+
 	svc := getLambdaAPI(l.Session)
 	in := &lambda.GetFunctionConcurrencyInput{
 		FunctionName: aws.String(name),
@@ -265,7 +266,13 @@ func (l LambdaSpec) FunctionHasReservedConcurrency(name string, concurrency int)
 		return
 	}
 
-	if aws.Int64Value(out.ReservedConcurrentExecutions) == int64(concurrency) {
+	reservedExecs := -1
+
+	if out.ReservedConcurrentExecutions != nil {
+		reservedExecs = int(aws.Int64Value(out.ReservedConcurrentExecutions))
+	}
+
+	if reservedExecs == concurrency {
 		res = true
 	}
 
