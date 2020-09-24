@@ -253,7 +253,7 @@ func (l LambdaSpec) FunctionAliasHasVersion(name, qualifier, version string) (re
 	return
 }
 
-// FunctionHasReservedConcurrency returns true if the provided Lambda function has the provided reserved concurrency. It throws an error if no function was found.
+// FunctionHasReservedConcurrency returns true if the provided Lambda function has the provided reserved concurrency. Use -1 to indicated unreserved concurrency. It throws an error if no function was found.
 func (l LambdaSpec) FunctionHasReservedConcurrency(name string, concurrency int) (res bool, err error) {
 
 	svc := getLambdaAPI(l.Session)
