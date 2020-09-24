@@ -267,6 +267,10 @@ func TestFunctionHasReservedConcurrency(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, res)
 
+	res, err = l.FunctionHasReservedConcurrency("nope", -1)
+	assert.Nil(t, err)
+	assert.True(t, res)
+
 	res, err = l.FunctionHasReservedConcurrency("nope", reservedExecs)
 	assert.Nil(t, err)
 	assert.False(t, res)

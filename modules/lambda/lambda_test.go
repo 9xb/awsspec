@@ -180,7 +180,5 @@ func (m mockLambdaAPI) GetFunctionConcurrency(input *lambda.GetFunctionConcurren
 		}, nil
 	}
 
-	return &lambda.GetFunctionConcurrencyOutput{
-		ReservedConcurrentExecutions: aws.Int64(5),
-	}, nil
+	return &lambda.GetFunctionConcurrencyOutput{}, nil
 }
