@@ -39,8 +39,12 @@ var (
 		"test_one",
 		"test_two",
 	}
-	vpc           = "test_vpc"
-	sourceARN     = "testARN"
+	vpc             = "test_vpc"
+	sourceARN       = "testARN"
+	sourceEndpoints = []string{
+		"/*/GET/test",
+		"/*/POST/test",
+	}
 	version       = "15"
 	reservedExecs = 50
 )
@@ -147,7 +151,7 @@ func (m mockLambdaAPI) GetPolicy(input *lambda.GetPolicyInput) (o *lambda.GetPol
 		"Version": "2012-10-17",
 		"Id": "default",
 		"Statement": [{
-			"Sid": "api-gw",
+			"Sid": "api-gw-1",
 			"Effect": "Allow",
 			"Principal": {
 				"Service": "apigateway.amazonaws.com"
@@ -156,8 +160,22 @@ func (m mockLambdaAPI) GetPolicy(input *lambda.GetPolicyInput) (o *lambda.GetPol
 			"Resource": "arn:aws:lambda:eu-west-1:357027635596:function:peracto-api-qa-api:live",
 			"Condition": {
 				"ArnLike": {
-					"AWS:SourceArn": "` + sourceARN + `"
-				}
+					"AWS:SourceArn": "` + sourceARN + sourceEndpoints[0] + `"
+				}	
+			}
+		},
+		{
+			"Sid": "api-gw-2",
+			"Effect": "Allow",
+			"Principal": {
+				"Service": "apigateway.amazonaws.com"
+			},
+			"Action": "lambda:InvokeFunction",
+			"Resource": "arn:aws:lambda:eu-west-1:357027635596:function:peracto-api-qa-api:live",
+			"Condition": {
+				"ArnLike": {
+					"AWS:SourceArn": "` + sourceARN + sourceEndpoints[1] + `"
+				}	
 			}
 		}]
 	}`

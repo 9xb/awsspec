@@ -225,11 +225,14 @@ func TestFunctionHasPermissions(t *testing.T) {
 	}
 
 	l := New(sess)
-	res, err := l.FunctionHasPermissions(functionName, "", sourceARN)
-	assert.Nil(t, err)
-	assert.True(t, res)
 
-	res, err = l.FunctionHasPermissions(functionName+"s", "", sourceARN)
+	for _, v := range sourceEndpoints {
+		res, err := l.FunctionHasPermissions(functionName, "", sourceARN+v)
+		assert.Nil(t, err)
+		assert.True(t, res)
+	}
+
+	res, err := l.FunctionHasPermissions(functionName+"s", "", sourceARN)
 	assert.Nil(t, err)
 	assert.False(t, res)
 
