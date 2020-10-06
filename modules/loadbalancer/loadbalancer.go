@@ -15,7 +15,7 @@ var getELBV2API = func(sess *session.Session) (client elbv2iface.ELBV2API) {
 	return elbv2.New(sess)
 }
 
-// New returns a new LambdaSpec
+// New returns a new ELBV2Spec
 func New(s *session.Session) ELBV2Spec {
 	return ELBV2Spec{
 		Session: s,
