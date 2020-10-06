@@ -232,8 +232,10 @@ func (l LambdaSpec) FunctionHasPermissions(name, qualifier, source string) (res 
 		return
 	}
 
-	if doc.Statement[0].Condition[iamSpec.ConditionArnLike][iamSpec.VarSourceArn][0] == source {
-		return true, nil
+	for _, v := range doc.Statement {
+		if v.Condition[iamSpec.ConditionArnLike][iamSpec.VarSourceArn][0] == source {
+			return true, nil
+		}
 	}
 
 	return
