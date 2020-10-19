@@ -17,6 +17,8 @@ var (
 	stageNoLog     = "testStageNoLog"
 	logDestination = "testLogs"
 	logFormat      = "testFormat"
+	rateLimit      = 5
+	burstLimit     = 10
 )
 
 func (m mockAPIGatewayV2API) GetApi(input *apigatewayv2.GetApiInput) (o *apigatewayv2.GetApiOutput, err error) {
@@ -41,6 +43,8 @@ func (m mockAPIGatewayV2API) GetStage(input *apigatewayv2.GetStageInput) (o *api
 			},
 			DefaultRouteSettings: &apigatewayv2.RouteSettings{
 				DetailedMetricsEnabled: aws.Bool(true),
+				ThrottlingBurstLimit:   aws.Int64(int64(burstLimit)),
+				ThrottlingRateLimit:    aws.Float64(float64(rateLimit)),
 			},
 		}
 
@@ -67,6 +71,8 @@ func (m mockAPIGatewayV2API) GetStage(input *apigatewayv2.GetStageInput) (o *api
 			},
 			DefaultRouteSettings: &apigatewayv2.RouteSettings{
 				DetailedMetricsEnabled: aws.Bool(false),
+				ThrottlingBurstLimit:   aws.Int64(int64(100)),
+				ThrottlingRateLimit:    aws.Float64(float64(200)),
 			},
 		}
 

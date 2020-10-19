@@ -160,3 +160,57 @@ func (a APIGatewayV2Spec) StageHasDetailedMetricsEnabled(apiID, stage string) (r
 
 	return
 }
+
+// StageHasRateLimit returns true if the specified stage associated to the provided API ID has rate limiting set to the provided value.
+func (a APIGatewayV2Spec) StageHasRateLimit(apiID, stage string, limit int) (res bool, err error) {
+	svc := getAPIGatewayV2API(a.Session)
+	in := &apigatewayv2.GetStageInput{
+		ApiId:     aws.String(apiID),
+		StageName: aws.String(stage),
+	}
+
+	out, err := svc.GetStage(in)
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == "NotFoundException" {
+				return false, nil
+			}
+		}
+		return
+	}
+
+	if out.DefaultRouteSettings.ThrottlingRateLimit != nil {
+		if aws.Float64Value(out.DefaultRouteSettings.ThrottlingRateLimit) == float64(limit) {
+			return true, nil
+		}
+	}
+
+	return
+}
+
+// StageHasBurstLimit returns true if the specified stage associated to the provided API ID has burst limiting set to the provided value.
+func (a APIGatewayV2Spec) StageHasBurstLimit(apiID, stage string, limit int) (res bool, err error) {
+	svc := getAPIGatewayV2API(a.Session)
+	in := &apigatewayv2.GetStageInput{
+		ApiId:     aws.String(apiID),
+		StageName: aws.String(stage),
+	}
+
+	out, err := svc.GetStage(in)
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == "NotFoundException" {
+				return false, nil
+			}
+		}
+		return
+	}
+
+	if out.DefaultRouteSettings.ThrottlingBurstLimit != nil {
+		if aws.Int64Value(out.DefaultRouteSettings.ThrottlingBurstLimit) == int64(limit) {
+			return true, nil
+		}
+	}
+
+	return
+}

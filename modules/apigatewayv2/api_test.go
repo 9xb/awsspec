@@ -109,3 +109,45 @@ func TestStageHasDetailedMetricsEnabled(t *testing.T) {
 	assert.Nil(t, err)
 	assert.False(t, res)
 }
+
+func TestStageHasRateLimit(t *testing.T) {
+	sess, _ := session.NewSession()
+	getAPIGatewayV2API = func(sess *session.Session) (client apigatewayv2iface.ApiGatewayV2API) {
+		return mockAPIGatewayV2API{}
+	}
+
+	a := New(sess)
+
+	res, err := a.StageHasRateLimit(apiID, stage, rateLimit)
+	assert.Nil(t, err)
+	assert.True(t, res)
+
+	res, err = a.StageHasRateLimit(apiID, stageNoLog, rateLimit)
+	assert.Nil(t, err)
+	assert.False(t, res)
+
+	res, err = a.StageHasRateLimit(apiID, "nope", rateLimit)
+	assert.Nil(t, err)
+	assert.False(t, res)
+}
+
+func TestStageHasBurstLimit(t *testing.T) {
+	sess, _ := session.NewSession()
+	getAPIGatewayV2API = func(sess *session.Session) (client apigatewayv2iface.ApiGatewayV2API) {
+		return mockAPIGatewayV2API{}
+	}
+
+	a := New(sess)
+
+	res, err := a.StageHasBurstLimit(apiID, stage, burstLimit)
+	assert.Nil(t, err)
+	assert.True(t, res)
+
+	res, err = a.StageHasBurstLimit(apiID, stageNoLog, burstLimit)
+	assert.Nil(t, err)
+	assert.False(t, res)
+
+	res, err = a.StageHasBurstLimit(apiID, "nope", burstLimit)
+	assert.Nil(t, err)
+	assert.False(t, res)
+}
